@@ -5,6 +5,8 @@
     using System.Security.Policy;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+    using Orleans.Runtime.Host;
+
     [TestClass]
     public class PartialTrustSiloTests
     {
@@ -39,7 +41,12 @@
 
         static void InitPartialTrustSilo(string[] args)
         {
+            string siloName = "PartialTrustSilo";
+            var siloHost = new SiloHost(siloName);
 
+            siloHost.InitializeOrleansSilo();
+
+            Assert.IsTrue(siloHost.StartOrleansSilo());
         }
     }
 }
