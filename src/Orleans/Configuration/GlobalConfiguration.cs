@@ -31,6 +31,7 @@ using System.Xml;
 using Orleans.Providers;
 using Orleans.Streams;
 using Orleans.Storage;
+using System.Security.Permissions;
 
 namespace Orleans.Runtime.Configuration
 {
@@ -400,7 +401,8 @@ namespace Orleans.Runtime.Configuration
             MaxJoinAttemptTime = DEFAULT_LIVENESS_MAX_JOIN_ATTEMPT_TIME;
             ExpectedClusterSizeConfigValue = new ConfigValue<int>(DEFAULT_LIVENESS_EXPECTED_CLUSTER_SIZE, true);
             ServiceId = Guid.Empty;
-            DeploymentId = Environment.UserName;
+            DeploymentId = new EnvironmentPermission(PermissionState.Unrestricted).IsUnrestricted()
+                ? Environment.UserName : "UNTRUSTED";
             DataConnectionString = "";
 
             CollectionQuantum = DEFAULT_COLLECTION_QUANTUM;

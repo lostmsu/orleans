@@ -137,7 +137,8 @@ namespace Orleans.Runtime.Host
         /// <returns></returns>
         public bool ParseArguments(string[] args)
         {
-            string siloName = Dns.GetHostName(); // Default to machine name
+            string siloName = new DnsPermission(System.Security.Permissions.PermissionState.Unrestricted).IsUnrestricted()
+                ? Dns.GetHostName(): "DefaultSilo";
             SiloHost = new SiloHost(siloName);
 
             int argPos = 1;

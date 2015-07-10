@@ -58,6 +58,7 @@ namespace Orleans.Runtime.Configuration
         /// The DNS host name of this silo.
         /// This is a true host name, no IP address. It is NOT settable, equals Dns.GetHostName().
         /// </summary>
+        [Obsolete("Can't be used in partial trust")]
         public string DNSHostName { get; private set; }
 
         /// <summary>
@@ -259,7 +260,8 @@ namespace Orleans.Runtime.Configuration
 
             SiloName = "";
             HostNameOrIPAddress = "";
-            DNSHostName = Dns.GetHostName();
+#warning DNSHostName is invalid in partial trust
+            DNSHostName = new DnsPermission(System.Security.Permissions.PermissionState.Unrestricted).IsUnrestricted()? Dns.GetHostName() : "WARNING: PARTIAL TRUST";
             Port = 0;
             Generation = 0;
             AddressType = AddressFamily.InterNetwork;
