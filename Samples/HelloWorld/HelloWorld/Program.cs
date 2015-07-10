@@ -28,6 +28,9 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 using System;
 using Orleans;
 using HelloWorldInterfaces;
+using System.Security;
+using System.Security.Policy;
+using System.IO;
 
 namespace HelloWorld
 {
@@ -42,15 +45,19 @@ namespace HelloWorld
             // The Orleans silo environment is initialized in its own app domain in order to more
             // closely emulate the distributed situation, when the client and the server cannot
             // pass data via shared memory.
-            AppDomain hostDomain = AppDomain.CreateDomain("OrleansHost", null, new AppDomainSetup
+            var appDomainSetup = new AppDomainSetup
             {
                 AppDomainInitializer = InitSilo,
-                AppDomainInitializerArguments = args,
-            });
+                AppDomainInitializerArguments = new []{ "lost-pc" },
+                ApplicationBase = Path.GetDirectoryName(typeof(Program).Assembly.Location),
+            };
+            var permissions = GetSiloPermissionSet();
+            AppDomain hostDomain = AppDomain.CreateDomain("OrleansHost", null, appDomainSetup, permissions);
 #endif
             GrainClient.Initialize("DevTestClientConfiguration.xml");
 
-            var friend = GrainFactory.GetGrain<IHello>(0);
+            var grainFactory = GrainClient.GrainFactory;
+            var friend = grainFactory.GetGrain<IHello>(0);
             Console.WriteLine("\n\n{0}\n\n", friend.SayHello("Good morning!").Result);
 
             Console.WriteLine("Orleans Silo is running.\nPress Enter to terminate...");
@@ -61,7 +68,16 @@ namespace HelloWorld
 #endif
         }
 
+
 #if USE_INPROC_SILO
+        static PermissionSet GetSiloPermissionSet()
+        {
+            var evidence = new Evidence();
+            evidence.AddHostEvidence(new Zone(SecurityZone.Internet));
+            var permissions = SecurityManager.GetStandardSandbox(evidence);
+            return permissions;
+        }
+
         static void InitSilo(string[] args)
         {
             hostWrapper = new OrleansHostWrapper(args);

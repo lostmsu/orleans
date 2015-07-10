@@ -29,6 +29,8 @@ namespace HelloWorld
 {
     internal class OrleansHostWrapper : IDisposable
     {
+        public string DefaultSiloName { get; set; }
+
         public bool Debug
         {
             get { return siloHost != null && siloHost.Debug; }
@@ -102,7 +104,7 @@ namespace HelloWorld
             string deploymentId = null;
 
             string configFileName = "DevTestServerConfiguration.xml";
-            string siloName = Dns.GetHostName(); // Default to machine name
+            string siloName = this.DefaultSiloName;
 
             int argPos = 1;
             for (int i = 0; i < args.Length; i++)
