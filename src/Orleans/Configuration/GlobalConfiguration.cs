@@ -364,6 +364,7 @@ namespace Orleans.Runtime.Configuration
         private const bool DEFAULT_LIVENESS_USE_LIVENESS_GOSSIP = true;
         private const int DEFAULT_LIVENESS_EXPECTED_CLUSTER_SIZE = 20;
         private const int DEFAULT_CACHE_SIZE = 1000000;
+        private const string DEFAULT_DEPLOYMENT_ID = "DefaultDeployment";
         private static readonly TimeSpan DEFAULT_INITIAL_CACHE_TTL = TimeSpan.FromSeconds(30);
         private static readonly TimeSpan DEFAULT_MAXIMUM_CACHE_TTL = TimeSpan.FromSeconds(240);
         private const double DEFAULT_TTL_EXTENSION_FACTOR = 2.0;
@@ -401,8 +402,7 @@ namespace Orleans.Runtime.Configuration
             MaxJoinAttemptTime = DEFAULT_LIVENESS_MAX_JOIN_ATTEMPT_TIME;
             ExpectedClusterSizeConfigValue = new ConfigValue<int>(DEFAULT_LIVENESS_EXPECTED_CLUSTER_SIZE, true);
             ServiceId = Guid.Empty;
-            DeploymentId = new EnvironmentPermission(PermissionState.Unrestricted).IsUnrestricted()
-                ? Environment.UserName : "UNTRUSTED";
+            DeploymentId = DEFAULT_DEPLOYMENT_ID;
             DataConnectionString = "";
 
             CollectionQuantum = DEFAULT_COLLECTION_QUANTUM;

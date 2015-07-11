@@ -74,10 +74,23 @@ namespace Orleans.Runtime.Configuration
         /// <summary>
         /// ClusterConfiguration constructor.
         /// </summary>
-        public ClusterConfiguration()
+        public ClusterConfiguration(): this(true) { }
+
+        /// <summary>
+        /// ClusterConfiguration constructor.
+        /// </summary>
+        public ClusterConfiguration(bool dynamicDefaults)
         {
             listeners = new Dictionary<string, List<Action>>();
             Init();
+
+            if (dynamicDefaults)
+                this.InitDynamicDefaults();
+        }
+
+        private void InitDynamicDefaults()
+        {
+            this.Globals.DeploymentId = Environment.UserName;
         }
 
         /// <summary>
