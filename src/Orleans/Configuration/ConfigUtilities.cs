@@ -217,8 +217,19 @@ namespace Orleans.Runtime.Configuration
                 {
                     config.TraceFilePattern = Path.Combine(traceFileDir, traceFileName);
                 }
-                config.TraceFileName = String.Format(config.TraceFilePattern, nodeName, timestamp.ToUniversalTime().ToString(dateFormat), Dns.GetHostName());
+                config.TraceFileName =
+                    IncludesHostName(config.TraceFilePattern)
+                    ? String.Format(config.TraceFilePattern, nodeName, timestamp.ToUniversalTime().ToString(dateFormat), Dns.GetHostName())
+                    : String.Format(config.TraceFilePattern, nodeName, timestamp.ToUniversalTime().ToString(dateFormat));
             }
+        }
+
+        private static bool IncludesHostName(string traceFilePattern)
+        {
+            if (traceFilePattern == null)
+                throw new ArgumentNullException(nameof(traceFilePattern));
+
+            return traceFilePattern.Contains("{2}");
         }
 
         internal static int ParseInt(string input, string errorMessage)
