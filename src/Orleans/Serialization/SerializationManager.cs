@@ -182,9 +182,20 @@ namespace Orleans.Serialization
             InstallAssemblyLoadEventHandler();
         }
 
+        /// <summary>
+        /// Gets the value, indicatig if Assembly.LoadFrom fix for serialization is enabled.
+        /// </summary>
+        /// <remarks>Types defined in assemblies loaded by path name (e.g. Assembly.LoadFrom) aren't resolved during deserialization without some help.</remarks>
+        public static bool AssemblyLoadFromFixEnabled { get; private set; }
+
         static SerializationManager()
         {
-            AppDomain.CurrentDomain.AssemblyResolve += OnResolveEventHandler;
+            try
+            {
+                AppDomain.CurrentDomain.AssemblyResolve += OnResolveEventHandler;
+                AssemblyLoadFromFixEnabled = true;
+            }
+            catch (MethodAccessException) { }
 
             registeredTypes = new HashSet<Type>();
             scannedAssemblies = new HashSet<Assembly>();

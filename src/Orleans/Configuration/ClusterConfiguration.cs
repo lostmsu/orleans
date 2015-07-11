@@ -79,6 +79,8 @@ namespace Orleans.Runtime.Configuration
         /// <summary>
         /// ClusterConfiguration constructor.
         /// </summary>
+        /// <param name="dynamicDefaults">Set to <c>false</c> to avoid generating environment-depended configuration
+        /// (useful in partial trust, where it might be inaccessible due to permissions)</param>
         public ClusterConfiguration(bool dynamicDefaults)
         {
             listeners = new Dictionary<string, List<Action>>();
