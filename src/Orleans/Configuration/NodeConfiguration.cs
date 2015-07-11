@@ -261,7 +261,7 @@ namespace Orleans.Runtime.Configuration
             SiloName = "";
             HostNameOrIPAddress = "";
 #warning DNSHostName is invalid in partial trust
-            DNSHostName = new DnsPermission(System.Security.Permissions.PermissionState.Unrestricted).IsUnrestricted()? Dns.GetHostName() : "WARNING: PARTIAL TRUST";
+            DNSHostName = new DnsPermission(System.Security.Permissions.PermissionState.Unrestricted).IsGranted()? Dns.GetHostName() : "WARNING: PARTIAL TRUST";
             Port = 0;
             Generation = 0;
             AddressType = AddressFamily.InterNetwork;
