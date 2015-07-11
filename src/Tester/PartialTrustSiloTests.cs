@@ -1,4 +1,4 @@
-﻿namespace Tester
+﻿namespace UnitTests.General
 {
     using System;
     using System.Security;
@@ -42,11 +42,10 @@
         static void InitPartialTrustSilo(string[] args)
         {
             string siloName = "PartialTrustSilo";
+
             var siloHost = new SiloHost(siloName);
 
             siloHost.InitializeOrleansSilo();
-
-            Assert.IsTrue(siloHost.StartOrleansSilo());
         }
     }
 }

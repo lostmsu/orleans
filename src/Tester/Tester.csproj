@@ -8,7 +8,7 @@
     <ProjectGuid>{591EF75B-D3B0-403D-830C-39D032A73404}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Tester</RootNamespace>
+    <RootNamespace>UnitTests.General</RootNamespace>
     <AssemblyName>Tester</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
