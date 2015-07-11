@@ -60,6 +60,10 @@ namespace Orleans.Runtime.Configuration
         /// </summary>
         bool TraceToConsole { get; set; }
         /// <summary>
+        /// The TraceToTraceListeners attribute specifies whther trace should be written to <see cref="System.Diagnostics.Trace"/>
+        /// </summary>
+        bool TraceToTraceListeners { get; set; }
+        /// <summary>
         /// The WriteMessagingTraces attribute specifies whether to write details message traces.
         /// This should be used only in development mode and never in production.
         /// </summary>

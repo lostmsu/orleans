@@ -97,6 +97,7 @@ namespace Orleans.Runtime.Configuration
         public IList<Tuple<string, Logger.Severity>> TraceLevelOverrides { get; private set; }
         public bool WriteMessagingTraces { get; set; }
         public bool TraceToConsole { get; set; }
+        public bool TraceToTraceListeners { get; set; } = true;
         public int LargeMessageWarningThreshold { get; set; }
         public bool PropagateActivityId { get; set; }
         public int BulkMessageLimit { get; set; }

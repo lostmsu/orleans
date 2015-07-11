@@ -170,6 +170,7 @@ namespace Orleans.Runtime.Configuration
         /// <summary>
         /// </summary>
         public bool TraceToConsole { get; set; }
+        public bool TraceToTraceListeners { get; set; } = true;
         /// <summary>
         /// </summary>
         public string TraceFilePattern

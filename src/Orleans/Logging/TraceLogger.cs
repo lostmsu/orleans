@@ -282,7 +282,7 @@ namespace Orleans.Runtime
                     }
                 }
 
-                if (Trace.Listeners.Count > 0)
+                if (config.TraceToTraceListeners)
                 {
                     // Plumb in log consumer to write to Trace listeners
                     var traceLogConsumer = new LogWriterToTrace();
