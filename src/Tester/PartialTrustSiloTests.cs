@@ -24,8 +24,11 @@
             var permissions = GetPartialTrustPermissions();
             var applicationBase = Path.GetDirectoryName(typeof(PartialTrustSiloTests).Assembly.Location);
 
-            string configFile = Path.Combine(applicationBase, "OrleansConfigurationForTesting.xml");
+            string configFile = Path.Combine(applicationBase, "OrleansConfigurationForPartialTrustTesting.xml");
             permissions.AddPermission(new FileIOPermission(FileIOPermissionAccess.Read, configFile));
+
+            string logFile = Path.Combine(applicationBase, "PartialTrustTest.log");
+            permissions.AddPermission(new FileIOPermission(FileIOPermissionAccess.AllAccess, logFile));
 
             var sandboxSetup = new AppDomainSetup
             {

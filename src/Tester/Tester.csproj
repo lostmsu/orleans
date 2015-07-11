@@ -112,6 +112,9 @@
     <Content Include="ClientConfigurationForStreamTesting.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="OrleansConfigurationForPartialTrustTesting.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="OrleansConfigurationForStreamingDeactivationUnitTests.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
