@@ -13,7 +13,13 @@
     public class PartialTrustSiloTests
     {
         [TestMethod]
-        public void CanStartSiloHostInPartialTrust()
+        public void CanConfigureSiloHost()
+        {
+            var sandbox = RunTestSandbox(ConfigurePartialTrustSilo);
+            AppDomain.Unload(sandbox);
+        }
+
+        static AppDomain RunTestSandbox(AppDomainInitializer initializer)
         {
             var permissions = GetPartialTrustPermissions();
             var applicationBase = Path.GetDirectoryName(typeof(PartialTrustSiloTests).Assembly.Location);
@@ -21,22 +27,15 @@
             string configFile = Path.Combine(applicationBase, "OrleansConfigurationForTesting.xml");
             permissions.AddPermission(new FileIOPermission(FileIOPermissionAccess.Read, configFile));
 
-            var hostDomain = AppDomain.CreateDomain("OrleansHost", null, new AppDomainSetup
+            var sandboxSetup = new AppDomainSetup
             {
-                AppDomainInitializer = InitPartialTrustSilo,
+                AppDomainInitializer = initializer,
                 ApplicationBase = applicationBase,
                 AppDomainInitializerArguments = new[] { configFile },
-            }, permissions);
+            };
 
-            try
-            {
-
-            }
-            finally
-            {
-                AppDomain.Unload(hostDomain);
-            }
-            Assert.Inconclusive();
+            var hostDomain = AppDomain.CreateDomain("OrleansHost", null, sandboxSetup, permissions);
+            return hostDomain;
         }
 
         static PermissionSet GetPartialTrustPermissions()
@@ -46,7 +45,7 @@
             return SecurityManager.GetStandardSandbox(evidence);
         }
 
-        static void InitPartialTrustSilo(string[] args)
+        static void ConfigurePartialTrustSilo(string[] args)
         {
             string siloName = "PartialTrustSilo";
 
@@ -56,7 +55,7 @@
                 ConfigFileName = args[0],
             };
 
-            siloHost.InitializeOrleansSilo();
+            siloHost.LoadOrleansConfig();
         }
     }
 }

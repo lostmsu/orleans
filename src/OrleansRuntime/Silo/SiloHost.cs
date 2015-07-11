@@ -136,6 +136,16 @@ namespace Orleans.Runtime.Host
         /// </summary>
         public void InitializeOrleansSilo()
         {
+            this.InitializeOrleansSilo(swallowException: true);
+        }
+
+        /// <summary>
+        /// Initialize this silo.
+        /// </summary>
+        /// <param name="swallowException">If set to <c>true</c>, any initialization exception will be
+        /// reported by a call to <see cref="ReportStartupError(Exception)"/>, and then swallowed.</param>
+        public void InitializeOrleansSilo(bool swallowException)
+        {
     #if DEBUG
             if (AppDomain.CurrentDomain.IsFullyTrusted)
                 AssemblyLoaderUtils.EnableAssemblyLoadTracing();
@@ -156,6 +166,9 @@ namespace Orleans.Runtime.Host
             }
             catch (Exception exc)
             {
+                if (!swallowException)
+                    throw;
+
                 ReportStartupError(exc);
                 orleans = null;
             }
