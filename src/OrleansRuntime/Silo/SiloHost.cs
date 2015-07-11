@@ -137,7 +137,8 @@ namespace Orleans.Runtime.Host
         public void InitializeOrleansSilo()
         {
     #if DEBUG
-            AssemblyLoaderUtils.EnableAssemblyLoadTracing();
+            if (AppDomain.CurrentDomain.IsFullyTrusted)
+                AssemblyLoaderUtils.EnableAssemblyLoadTracing();
     #endif
 
             try
