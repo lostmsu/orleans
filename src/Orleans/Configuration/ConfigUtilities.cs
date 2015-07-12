@@ -56,6 +56,11 @@ namespace Orleans.Runtime.Configuration
             {
                 config.TraceFilePattern = root.GetAttribute("TraceToFile");
             }
+            if (root.HasAttribute("TraceToTraceListeners"))
+            {
+                config.TraceToTraceListeners = ParseBool(root.GetAttribute("TraceToTraceListeners"),
+                    "Invalid boolean value for TraceToTraceListeners attribute on Tracing element for " + nodeName);
+            }
             if (root.HasAttribute("WriteMessagingTraces"))
             {
                 config.WriteMessagingTraces = ParseBool(root.GetAttribute("WriteMessagingTraces"),

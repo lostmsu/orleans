@@ -326,6 +326,7 @@ namespace Orleans.Runtime.Configuration
             DefaultTraceLevel = other.DefaultTraceLevel;
             TraceLevelOverrides = new List<Tuple<string, Logger.Severity>>(other.TraceLevelOverrides);
             TraceToConsole = other.TraceToConsole;
+            TraceToTraceListeners = other.TraceToTraceListeners;
             TraceFilePattern = other.TraceFilePattern;
             TraceFileName = other.TraceFileName;
             WriteMessagingTraces = other.WriteMessagingTraces;
