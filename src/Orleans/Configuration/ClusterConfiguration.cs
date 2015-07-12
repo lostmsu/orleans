@@ -534,6 +534,7 @@ namespace Orleans.Runtime.Configuration
         /// If there are multiple addresses in the correct family in the server's DNS record, the first will be returned.
         /// </summary>
         /// <returns>The server's IPv4 address.</returns>
+        [Obsolete("Do not use this method, as it might not be available in partial trust")]
         internal static IPAddress GetLocalIPAddress(AddressFamily family = AddressFamily.InterNetwork, string interfaceName = null)
         {
             var loopback = (family == AddressFamily.InterNetwork) ? IPAddress.Loopback : IPAddress.IPv6Loopback;
