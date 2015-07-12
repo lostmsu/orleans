@@ -6,7 +6,7 @@
       <!--<Provider Type="Orleans.Storage.AzureTableStorage" Name="AzureStore" />-->
     </StorageProviders>
     <SeedNode Address="localhost" Port="22222"/>
-    <Messaging ResponseTimeout="30s"/>
+    <Messaging ResponseTimeout="30s" UseStandardSerializer="true"/>
   </Globals>
   <Defaults>
     <Networking Address="localhost" Port="22222"/>

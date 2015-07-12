@@ -179,7 +179,8 @@ namespace Orleans.Serialization
                 FallbackCopiesTimeStatistic = CounterStatistic.FindOrCreate(StatisticNames.SERIALIZATION_BODY_FALLBACK_DEEPCOPY_MILLIS, storeFallback).AddValueConverter(Utils.TicksToMilliSeconds);
             }
 
-            InstallAssemblyLoadEventHandler();
+            if (!useStandardSerializer)
+                InstallAssemblyLoadEventHandler();
         }
 
         /// <summary>
