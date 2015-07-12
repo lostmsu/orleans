@@ -28,8 +28,9 @@ using System.Runtime;
 using System.Threading;
 using System.Globalization;
 
+using Orleans.Runtime;
 using Orleans.Runtime.Configuration;
-
+using System.Security.Permissions;
 
 namespace Orleans.Runtime.Host
 {
@@ -155,8 +156,9 @@ namespace Orleans.Runtime.Host
             {
                 if (!ConfigLoaded) LoadOrleansConfig();
 
-                logger.Info( ErrorCode.SiloInitializing, "Initializing Silo {0} on host={1} CPU count={2} running .NET version='{3}' Is .NET 4.5={4} OS version='{5}'",
-                    Name, Environment.MachineName, Environment.ProcessorCount, Environment.Version, ConfigUtilities.IsNet45OrNewer(), Environment.OSVersion);
+                if (new EnvironmentPermission(PermissionState.Unrestricted).IsGranted())
+                    logger.Info( ErrorCode.SiloInitializing, "Initializing Silo {0} on host={1} CPU count={2} running .NET version='{3}' Is .NET 4.5={4} OS version='{5}'",
+                        Name, Environment.MachineName, Environment.ProcessorCount, Environment.Version, ConfigUtilities.IsNet45OrNewer(), Environment.OSVersion);
 
                 logger.Info(ErrorCode.SiloGcSetting, "Silo running with GC settings: ServerGC={0} GCLatencyMode={1}", GCSettings.IsServerGC, Enum.GetName(typeof(GCLatencyMode), GCSettings.LatencyMode));
                 if (!GCSettings.IsServerGC)
