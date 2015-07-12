@@ -19,6 +19,13 @@
             AppDomain.Unload(sandbox);
         }
 
+        [TestMethod]
+        public void CanInitializeSiloHost()
+        {
+            var sandbox = RunTestSandbox(InitializePartialTrustSilo);
+            AppDomain.Unload(sandbox);
+        }
+
         static AppDomain RunTestSandbox(AppDomainInitializer initializer)
         {
             var permissions = GetPartialTrustPermissions();
@@ -50,15 +57,29 @@
 
         static void ConfigurePartialTrustSilo(string[] args)
         {
+            ConfigurePartialTrustSilo(args[0]);
+        }
+
+        private static SiloHost ConfigurePartialTrustSilo(string configFileName)
+        {
             string siloName = "PartialTrustSilo";
 
             var siloHost = new SiloHost(siloName)
             {
                 Config = new ClusterConfiguration(dynamicDefaults: false),
-                ConfigFileName = args[0],
+                ConfigFileName = configFileName,
             };
 
             siloHost.LoadOrleansConfig();
+
+            return siloHost;
+        }
+
+        static void InitializePartialTrustSilo(string[] args)
+        {
+            var host = ConfigurePartialTrustSilo(args[0]);
+
+            host.InitializeOrleansSilo(swallowException: false);
         }
     }
 }
