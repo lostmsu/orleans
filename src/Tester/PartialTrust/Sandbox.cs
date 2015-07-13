@@ -29,7 +29,7 @@ namespace UnitTests.PartialTrust
     using System.Security.Permissions;
     using System.Security.Policy;
 
-    static class Sandbox
+    public static class Sandbox
     {
         public const string PartialTrustConfig = "OrleansConfigurationForPartialTrustTesting.xml";
 
