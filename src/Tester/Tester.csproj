@@ -81,7 +81,9 @@
     <Compile Include="GenericGrainTests.cs" />
     <Compile Include="GrainInterfaceHierarchyTests.cs" />
     <Compile Include="ObserverTests.cs" />
-    <Compile Include="PartialTrustSiloTests.cs" />
+    <Compile Include="PartialTrust\ConfigurationTests.cs" />
+    <Compile Include="PartialTrust\Sandbox.cs" />
+    <Compile Include="PartialTrust\SiloTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="..\Build\GlobalAssemblyInfo.cs">
       <Link>Properties\GlobalAssemblyInfo.cs</Link>
