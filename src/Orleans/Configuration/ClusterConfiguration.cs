@@ -30,7 +30,7 @@ using System.IO;
 using System.Xml;
 using System.Net.Sockets;
 using System.Net.NetworkInformation;
-
+using System.Security.Permissions;
 
 namespace Orleans.Runtime.Configuration
 {
@@ -422,8 +422,13 @@ namespace Orleans.Runtime.Configuration
         public string ToString(string siloName)
         {
             var sb = new StringBuilder();
-            sb.Append("Config File Name: ").AppendLine(string.IsNullOrEmpty(SourceFile) ? "" : Path.GetFullPath(SourceFile));
-            sb.Append("Host: ").AppendLine(Dns.GetHostName());
+
+            sb.Append("Config File Name: ").AppendLine(string.IsNullOrEmpty(SourceFile)
+                ? "" : GetFullPathIfPermitted(SourceFile));
+
+            if (new DnsPermission(PermissionState.Unrestricted).IsGranted())
+                sb.Append("Host: ").AppendLine(Dns.GetHostName());
+
             sb.Append("Start time: ").AppendLine(TraceLogger.PrintDate(DateTime.UtcNow));
             sb.Append("Primary node: ").AppendLine(PrimaryNode == null ? "null" : PrimaryNode.ToString());
             sb.AppendLine("Platform version info:").Append(ConfigUtilities.RuntimeVersionInfo());
@@ -432,6 +437,13 @@ namespace Orleans.Runtime.Configuration
             sb.AppendLine("Silo configuration:").Append(nc.ToString());
             sb.AppendLine();
             return sb.ToString();
+        }
+
+        private string GetFullPathIfPermitted(string filePath)
+        {
+            return new FileIOPermission(FileIOPermissionAccess.PathDiscovery, SourceFile).IsGranted()
+                ? Path.GetFullPath(filePath)
+                : filePath;
         }
 
         internal static IPAddress ResolveIPAddress(string addrOrHost, byte[] subnet, AddressFamily family)
