@@ -35,6 +35,11 @@ namespace Orleans
         private static UnobservedExceptionDelegate unobservedExceptionHandler;
         private static readonly bool alreadySubscribedToTplEvent = false;
 
+        internal static bool TaskSchedulerUnobservedExceptionRecoverySupported
+        {
+            get { return alreadySubscribedToTplEvent; }
+        }
+
         internal delegate void UnobservedExceptionDelegate(ISchedulingContext context, Exception exception);
         
         static UnobservedExceptionsHandlerClass()
@@ -43,8 +48,14 @@ namespace Orleans
             {
                 if (!alreadySubscribedToTplEvent)
                 {
-                    TaskScheduler.UnobservedTaskException += InternalUnobservedTaskExceptionHandler;
-                    alreadySubscribedToTplEvent = true;
+                    try
+                    {
+                        TaskScheduler.UnobservedTaskException += InternalUnobservedTaskExceptionHandler;
+                        alreadySubscribedToTplEvent = true;
+                    }
+                    catch (MethodAccessException) {
+                        // can't enable unobserved exception recovery due to lack of permission
+                    }
                 }
             }
         }
