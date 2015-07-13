@@ -24,7 +24,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 using System;
 using System.Diagnostics;
 using System.Reflection;
-
+using System.Security.Permissions;
 
 namespace Orleans.Runtime
 {
@@ -38,9 +38,8 @@ namespace Orleans.Runtime
             get
             {
                 Assembly thisProg = Assembly.GetExecutingAssembly();
-                FileVersionInfo progVersionInfo = FileVersionInfo.GetVersionInfo(thisProg.Location);
-                bool isDebug = IsAssemblyDebugBuild(thisProg);
-                string productVersion = progVersionInfo.ProductVersion + (isDebug ? " (Debug)." : " (Release)."); // progVersionInfo.IsDebug; does not work
+                string productVersion = GetFileVersionInfo(thisProg);
+                productVersion += IsAssemblyDebugBuild(thisProg) ? " (Debug)." : " (Release)."; // progVersionInfo.IsDebug; does not work
                 return string.IsNullOrEmpty(productVersion) ? ApiVersion : productVersion;
             }
         }
@@ -48,18 +47,27 @@ namespace Orleans.Runtime
         /// <summary>
         /// The ApiVersion of the Orleans runtime, eg: '1.0.0.0'
         /// </summary>
+        /// <remarks>Not avaliable in partial trust, unless read permission granted to Orleans assembly</remarks>
         public static string ApiVersion
         {
             get
             {
-                AssemblyName libraryInfo = Assembly.GetExecutingAssembly().GetName();
-                return libraryInfo.Version.ToString();
+                try
+                {
+                    AssemblyName libraryInfo = Assembly.GetExecutingAssembly().GetName();
+                    return libraryInfo.Version.ToString();
+                }
+                catch (System.Security.SecurityException e) when(e.PermissionType == typeof(FileIOPermission))
+                {
+                    return HiddenVersion;
+                }
             }
         }
 
         /// <summary>
         /// The FileVersion of the Orleans runtime, eg: '2012.5.9.51607'
         /// </summary>
+        [Obsolete("Use ApiVersion, as this property is not available in partial trust")]
         public static string FileVersion
         {
             get
@@ -97,6 +105,8 @@ namespace Orleans.Runtime
 #endif
         }
 
+        public const string HiddenVersion = "HIDDEN_VERSION";
+
         private static bool IsAssemblyDebugBuild(Assembly assembly)
         {
             foreach (var attribute in assembly.GetCustomAttributes(false))
@@ -108,5 +118,10 @@ namespace Orleans.Runtime
             return false;
         }
 
+        static string GetFileVersionInfo(Assembly assmebly)
+        {
+            FileVersionInfo progVersionInfo = FileVersionInfo.GetVersionInfo(assmebly.Location);
+            return progVersionInfo.ProductVersion;
+        }
     }
 }
