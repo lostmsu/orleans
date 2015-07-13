@@ -46,7 +46,7 @@ using Orleans.Serialization;
 using Orleans.Storage;
 using Orleans.Streams;
 using Orleans.Timers;
-
+using System.Reflection;
 
 namespace Orleans.Runtime
 {
@@ -191,7 +191,7 @@ namespace Orleans.Runtime
             TraceLogger.MyIPEndPoint = here;
             logger = TraceLogger.GetLogger("Silo", TraceLogger.LoggerType.Runtime);
             logger.Info(ErrorCode.SiloInitializing, "-------------- Initializing {0} silo on {1} at {2}, gen {3} --------------", siloType, nodeConfig.DNSHostName, here, generation);
-            logger.Info(ErrorCode.SiloInitConfig, "Starting silo {0} with runtime Version='{1}' Config= " + Environment.NewLine + "{2}", name, RuntimeVersion.Current, config.ToString(name));
+            logger.Info(ErrorCode.SiloInitConfig, "Starting silo {0} with API Version='{1}' Config= " + Environment.NewLine + "{2}", name, RuntimeVersion.ApiVersion, config.ToString(name));
 
             if (keyStore != null)
             {
@@ -203,9 +203,14 @@ namespace Orleans.Runtime
             BufferPool.InitGlobalBufferPool(globalConfig);
             PlacementStrategy.Initialize(globalConfig);
 
-            UnobservedExceptionsHandlerClass.SetUnobservedExceptionHandler(UnobservedExceptionHandler);
-            AppDomain.CurrentDomain.UnhandledException +=
-                (obj, ev) => DomainUnobservedExceptionHandler(obj, (Exception)ev.ExceptionObject);
+            if (typeof(Silo).Assembly.IsFullyTrusted)
+            {
+                // TODO: is wrapper required for this to work in partial trust?
+                UnobservedExceptionsHandlerClass.SetUnobservedExceptionHandler(UnobservedExceptionHandler);
+                AppDomain.CurrentDomain.UnhandledException +=
+                    (obj, ev) => DomainUnobservedExceptionHandler(obj, (Exception)ev.ExceptionObject);
+                this.UnobservedExceptionHandlingEnabled = true;
+            }
 
             grainFactory = new GrainFactory();
             typeManager = new GrainTypeManager(here.Address.Equals(IPAddress.Loopback), grainFactory);
@@ -222,7 +227,7 @@ namespace Orleans.Runtime
             var mc = new MessageCenter(here, generation, globalConfig, siloStatistics.MetricsTable);
             if (nodeConfig.IsGatewayNode)
                 mc.InstallGateway(nodeConfig.ProxyGatewayEndpoint);
-            
+
             messageCenter = mc;
 
             // GrainRuntime can be created only here, after messageCenter was created.
@@ -234,15 +239,15 @@ namespace Orleans.Runtime
 
             // Now the router/directory service
             // This has to come after the message center //; note that it then gets injected back into the message center.;
-            localGrainDirectory = new LocalGrainDirectory(this); 
+            localGrainDirectory = new LocalGrainDirectory(this);
 
             // Now the activation directory.
             // This needs to know which router to use so that it can keep the global directory in synch with the local one.
             activationDirectory = new ActivationDirectory();
-            
+
             // Now the consistent ring provider
             RingProvider = GlobalConfig.UseVirtualBucketsConsistentRing ?
-                (IConsistentRingProvider) new VirtualBucketsRingProvider(SiloAddress, GlobalConfig.NumVirtualBucketsConsistentRing)
+                (IConsistentRingProvider)new VirtualBucketsRingProvider(SiloAddress, GlobalConfig.NumVirtualBucketsConsistentRing)
                 : new ConsistentRingProvider(SiloAddress);
 
             Action<Dispatcher> setDispatcher;
@@ -251,12 +256,12 @@ namespace Orleans.Runtime
             setDispatcher(dispatcher);
 
             RuntimeClient.Current = new InsideRuntimeClient(
-                dispatcher, 
-                catalog, 
-                LocalGrainDirectory, 
-                SiloAddress, 
-                config, 
-                RingProvider, 
+                dispatcher,
+                catalog,
+                LocalGrainDirectory,
+                SiloAddress,
+                config,
+                RingProvider,
                 typeManager,
                 grainFactory);
             messageCenter.RerouteHandler = InsideRuntimeClient.Current.RerouteMessage;
@@ -277,7 +282,7 @@ namespace Orleans.Runtime
 
             membershipFactory = new MembershipFactory();
             reminderFactory = new LocalReminderServiceFactory();
-            
+
             SystemStatus.Current = SystemStatus.Created;
 
             StringValueStatistic.FindOrCreate(StatisticNames.SILO_START_TIME,
@@ -287,6 +292,8 @@ namespace Orleans.Runtime
 
             logger.Info(ErrorCode.SiloInitializingFinished, "-------------- Started silo {0}, ConsistentHashCode {1:X} --------------", SiloAddress.ToLongString(), SiloAddress.GetConsistentHashCode());
         }
+
+        public bool UnobservedExceptionHandlingEnabled { get; private set; }
 
         private void CreateSystemTargets()
         {
