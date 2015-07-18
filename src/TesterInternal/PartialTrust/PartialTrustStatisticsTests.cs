@@ -29,7 +29,7 @@ namespace UnitTests.PartialTrust
     using Orleans.Runtime.Counters;
 
     [TestClass]
-    public class SiloStatisticsManagerTests
+    public class PartialTrustStatisticsTests
     {
         [TestMethod]
         public void CanInstantiateRuntimeStatisticsGroup()

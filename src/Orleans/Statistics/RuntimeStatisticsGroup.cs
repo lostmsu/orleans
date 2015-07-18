@@ -21,9 +21,10 @@ OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHE
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-﻿#define LOG_MEMORY_PERF_COUNTERS
+#define LOG_MEMORY_PERF_COUNTERS
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Management;
 
 using System.Threading;
@@ -82,51 +83,53 @@ namespace Orleans.Runtime
             }
         }
 #endif
-        internal RuntimeStatisticsGroup()
-        {
-            InitCpuMemoryCounters();
-        }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
-        private void InitCpuMemoryCounters()
+        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
+        internal RuntimeStatisticsGroup()
         {
             try
             {
-                cpuCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total", true);
-                availableMemoryCounter = new PerformanceCounter("Memory", "Available Bytes", true); 
-#if LOG_MEMORY_PERF_COUNTERS
-                string thisProcess = Process.GetCurrentProcess().ProcessName;
-                timeInGC = new PerformanceCounter(".NET CLR Memory", "% Time in GC", thisProcess, true);
-                genSizes = new PerformanceCounter[] { 
-                    new PerformanceCounter(".NET CLR Memory", "Gen 0 heap size", thisProcess, true), 
-                    new PerformanceCounter(".NET CLR Memory", "Gen 1 heap size", thisProcess, true), 
-                    new PerformanceCounter(".NET CLR Memory", "Gen 2 heap size", thisProcess, true)
-                };
-                allocatedBytesPerSec = new PerformanceCounter(".NET CLR Memory", "Allocated Bytes/sec", thisProcess, true);
-                promotedMemoryFromGen1 = new PerformanceCounter(".NET CLR Memory", "Promoted Memory from Gen 1", thisProcess, true);
-                numberOfInducedGCs = new PerformanceCounter(".NET CLR Memory", "# Induced GC", thisProcess, true);
-                largeObjectHeapSize = new PerformanceCounter(".NET CLR Memory", "Large Object Heap size", thisProcess, true);
-                promotedFinalizationMemoryFromGen0 = new PerformanceCounter(".NET CLR Memory", "Promoted Finalization-Memory from Gen 0", thisProcess, true);
-#endif
-
-                // For Mono one could use PerformanceCounter("Mono Memory", "Total Physical Memory");
-                const string Query = "SELECT Capacity FROM Win32_PhysicalMemory";
-                var searcher = new ManagementObjectSearcher(Query);
-                long Capacity = 0;
-                foreach (ManagementObject WniPART in searcher.Get())
-                    Capacity += Convert.ToInt64(WniPART.Properties["Capacity"].Value);
-
-                if (Capacity == 0)
-                    throw new Exception("No physical ram installed on machine?");
-
-                TotalPhysicalMemory = Capacity;
-                countersAvailable = true;
+                InitCpuMemoryCounters();
             }
             catch (Exception)
             {
                 logger.Warn(ErrorCode.PerfCounterConnectError,
                     "Error initializing CPU & Memory perf counters - you need to repair Windows perf counter config on this machine with 'lodctr /r' command");
             }
+        }
+
+        private void InitCpuMemoryCounters()
+        {
+           
+            cpuCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total", true);
+            availableMemoryCounter = new PerformanceCounter("Memory", "Available Bytes", true); 
+#if LOG_MEMORY_PERF_COUNTERS
+            string thisProcess = Process.GetCurrentProcess().ProcessName;
+            timeInGC = new PerformanceCounter(".NET CLR Memory", "% Time in GC", thisProcess, true);
+            genSizes = new PerformanceCounter[] { 
+                new PerformanceCounter(".NET CLR Memory", "Gen 0 heap size", thisProcess, true), 
+                new PerformanceCounter(".NET CLR Memory", "Gen 1 heap size", thisProcess, true), 
+                new PerformanceCounter(".NET CLR Memory", "Gen 2 heap size", thisProcess, true)
+            };
+            allocatedBytesPerSec = new PerformanceCounter(".NET CLR Memory", "Allocated Bytes/sec", thisProcess, true);
+            promotedMemoryFromGen1 = new PerformanceCounter(".NET CLR Memory", "Promoted Memory from Gen 1", thisProcess, true);
+            numberOfInducedGCs = new PerformanceCounter(".NET CLR Memory", "# Induced GC", thisProcess, true);
+            largeObjectHeapSize = new PerformanceCounter(".NET CLR Memory", "Large Object Heap size", thisProcess, true);
+            promotedFinalizationMemoryFromGen0 = new PerformanceCounter(".NET CLR Memory", "Promoted Finalization-Memory from Gen 0", thisProcess, true);
+#endif
+
+            // For Mono one could use PerformanceCounter("Mono Memory", "Total Physical Memory");
+            const string Query = "SELECT Capacity FROM Win32_PhysicalMemory";
+            var searcher = new ManagementObjectSearcher(Query);
+            long Capacity = 0;
+            foreach (ManagementObject WniPART in searcher.Get())
+                Capacity += Convert.ToInt64(WniPART.Properties["Capacity"].Value);
+
+            if (Capacity == 0)
+                throw new Exception("No physical ram installed on machine?");
+
+            TotalPhysicalMemory = Capacity;
+            countersAvailable = true;
         }
 
         internal void Start()
