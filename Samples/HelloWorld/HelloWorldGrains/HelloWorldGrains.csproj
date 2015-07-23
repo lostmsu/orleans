@@ -33,10 +33,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Orleans, Version=1.0.0.0, Culture=neutral, PublicKeyToken=070f47935e3ed133, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Microsoft.Orleans.Core.1.0.8\lib\net45\Orleans.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -51,6 +47,10 @@
     <Compile Include="Properties\orleans.codegen.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\src\Orleans\Orleans.csproj">
+      <Project>{bc1bd60c-e7d8-4452-a21c-290aec8e2e74}</Project>
+      <Name>Orleans</Name>
+    </ProjectReference>
     <ProjectReference Include="..\HelloWorldInterfaces\HelloWorldInterfaces.csproj">
       <Project>{163cce80-c506-468c-9b28-e2ff198097e3}</Project>
       <Name>HelloWorldInterfaces</Name>
