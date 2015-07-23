@@ -25,6 +25,7 @@ namespace UnitTests.PartialTrust
 {
     using System;
     using System.IO;
+    using System.Linq;
     using System.Security;
     using System.Security.Permissions;
     using System.Security.Policy;
@@ -56,7 +57,13 @@ namespace UnitTests.PartialTrust
                 AppDomainInitializerArguments = new[] { configFile },
             };
 
-            var hostDomain = AppDomain.CreateDomain("OrleansHost", null, sandboxSetup, permissions);
+            var trustedAssemblies =
+                new[] { typeof(Orleans.Runtime.Silo), typeof(Sandbox) }
+                .Select(_ => _.Assembly.GetName())
+                .Select(_ => new StrongName(new StrongNamePublicKeyBlob(_.GetPublicKey()), _.Name, _.Version))
+                .ToArray();
+
+            var hostDomain = AppDomain.CreateDomain("OrleansHost", null, sandboxSetup, permissions, trustedAssemblies);
             return hostDomain;
         }
 

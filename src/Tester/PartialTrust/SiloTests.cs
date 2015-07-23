@@ -24,10 +24,6 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 namespace UnitTests.PartialTrust
 {
     using System;
-    using System.IO;
-    using System.Security;
-    using System.Security.Permissions;
-    using System.Security.Policy;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Orleans.Runtime.Configuration;
     using Orleans.Runtime.Host;
