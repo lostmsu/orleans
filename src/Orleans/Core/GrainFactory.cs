@@ -32,10 +32,11 @@ namespace Orleans
 {
     using System.Threading.Tasks;
 
+    // TODO: SECURITY: must provide marshallable wrapper
     /// <summary>
     /// Factory for accessing grains.
     /// </summary>
-    public class GrainFactory : IGrainFactory
+    public class GrainFactory : MarshalByRefObject, IGrainFactory
     {
         /// <summary>
         /// The collection of <see cref="IGrainObserver"/> <c>CreateObjectReference</c> delegates.

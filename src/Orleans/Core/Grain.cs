@@ -37,7 +37,7 @@ namespace Orleans
     /// <summary>
     /// The abstract base class for all grain classes.
     /// </summary>
-    public abstract class Grain : IAddressable
+    public abstract class Grain : MarshalByRefObject, IAddressable
     {
         private IGrainRuntime runtime;
 
@@ -65,7 +65,7 @@ namespace Orleans
 
         protected IGrainFactory GrainFactory { get; private set; }
 
-        internal IGrainIdentity Identity;
+        internal IGrainIdentity Identity { get; set; }
 
         /// <summary>
         /// This constructor should never be invoked. We expose it so that client code (subclasses of Grain) do not have to add a constructor.

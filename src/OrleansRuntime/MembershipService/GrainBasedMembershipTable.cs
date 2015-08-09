@@ -32,11 +32,10 @@ namespace Orleans.Runtime.MembershipService
     internal class GrainBasedMembershipTable : Grain, IMembershipTableGrain
     {
         private InMemoryMembershipTable table;
-        private TraceLogger logger;
+        private TraceLogger logger = TraceLogger.GetLogger("GrainBasedMembershipTable", TraceLogger.LoggerType.Runtime);
 
         public override Task OnActivateAsync()
         {
-            logger = TraceLogger.GetLogger("GrainBasedMembershipTable", TraceLogger.LoggerType.Runtime);
             logger.Info(ErrorCode.MembershipGrainBasedTable1, "GrainBasedMembershipTable Activated.");
             table = new InMemoryMembershipTable();
             return TaskDone.Done;

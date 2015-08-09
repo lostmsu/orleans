@@ -5,7 +5,8 @@ using Orleans.Timers;
 
 namespace Orleans.Runtime
 {
-    internal class GrainRuntime : IGrainRuntime
+    // TODO: SECURITY: must provide marshallable wrapper
+    internal class GrainRuntime : MarshalByRefObject, IGrainRuntime
     {
         public GrainRuntime(string siloId, IGrainFactory grainFactory, ITimerRegistry timerRegistry, IReminderRegistry reminderRegistry, IStreamProviderManager streamProviderManager)
         {

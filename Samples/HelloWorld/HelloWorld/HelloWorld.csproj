@@ -68,6 +68,10 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="TaskRemoting, Version=0.1.0.32935, Culture=neutral, PublicKeyToken=3778033b7ff7d17c, processorArchitecture=MSIL">
+      <HintPath>..\..\..\src\packages\TaskRemoting.0.1.0\lib\TaskRemoting.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
@@ -76,7 +80,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Content Include="DevTestClientConfiguration.xml">

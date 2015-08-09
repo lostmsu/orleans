@@ -30,7 +30,8 @@ namespace Orleans.Runtime
     /// Interface of Orleans runtime for logging services. 
     /// </summary>
     [Serializable]
-    public abstract class Logger
+    // TODO: SECURITY: marshallable wrapper
+    public abstract class Logger : MarshalByRefObject
     {
         /// <summary> Severity levels for log messages. </summary>
         public enum Severity

@@ -28,6 +28,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
+using TaskRemoting;
+
 using Orleans.CodeGeneration;
 using Orleans.Core;
 using Orleans.Providers;
@@ -84,6 +86,7 @@ namespace Orleans.Runtime
         private readonly IntValueStatistic inProcessRequests;
         private readonly CounterStatistic collectionCounter;
         private readonly IGrainRuntime grainRuntime;
+        private readonly Sandbox sandbox;
 
         internal Catalog(
             GrainId grainId, 
@@ -133,6 +136,7 @@ namespace Orleans.Runtime
                 }
                 return counter;
             });
+            this.sandbox = new Sandbox();
         }
 
         internal void SetStorageManager(IStorageProviderManager storageManager)
@@ -554,7 +558,7 @@ namespace Orleans.Runtime
             Type stateObjectType = grainTypeData.StateObjectType;
             lock (data)
             {
-                var grain = (Grain) Activator.CreateInstance(grainType);
+                var grain = (Grain)this.sandbox.CreateInstance(grainType);
                 grain.Identity = data.Identity;
                 grain.Runtime = grainRuntime;
                 data.SetGrainInstance(grain);
@@ -572,9 +576,11 @@ namespace Orleans.Runtime
 
             activations.IncrementGrainCounter(grainClassName);
 
-            data.GrainInstance.Data = data;
+            // TODO: remoting: pass data
+            // data.GrainInstance.Data = data;
 
-            if (logger.IsVerbose) logger.Verbose("CreateGrainInstance {0}{1}", data.Grain, data.ActivationId);
+            if (logger.IsVerbose)
+                logger.Verbose("CreateGrainInstance {0}{1}", data.Grain, data.ActivationId);
         }
 
         private void SetupStorageProvider(ActivationData data)
@@ -964,7 +970,7 @@ namespace Orleans.Runtime
             // Call OnActivateAsync inline, but within try-catch wrapper to safely capture any exceptions thrown from called function
             try
             {
-                await activation.GrainInstance.OnActivateAsync();
+                await this.sandbox.Domain.Invoke(activation.GrainInstance.OnActivateAsync);
 
                 if (logger.IsVerbose) logger.Verbose(ErrorCode.Catalog_AfterCallingActivate, "Returned from calling {1} grain's OnActivateAsync() method {0}", activation, grainTypeName);
 

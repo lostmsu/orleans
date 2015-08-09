@@ -69,6 +69,10 @@
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="TaskRemoting, Version=0.1.0.32935, Culture=neutral, PublicKeyToken=3778033b7ff7d17c, processorArchitecture=MSIL">
+      <HintPath>..\packages\TaskRemoting.0.1.0\lib\TaskRemoting.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Catalog\ActivationState.cs" />
@@ -110,6 +114,7 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="ReminderService\MockReminderTable.cs" />
+    <Compile Include="Sandbox\Sandbox.cs" />
     <Compile Include="Scheduler\ITaskScheduler.cs" />
     <Compile Include="Storage\IStorageProviderManager.cs" />
     <Compile Include="Silo\SiloHost.cs" />
@@ -200,8 +205,8 @@
     <None Include="..\Orleans.snk">
       <Link>Orleans.snk</Link>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- Begin Orleans: Without these lines the project won't build properly -->
   <PropertyGroup>
