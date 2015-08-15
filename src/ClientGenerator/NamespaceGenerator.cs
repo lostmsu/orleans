@@ -631,6 +631,8 @@ namespace Orleans.CodeGeneration
                 new CodeAttributeArgument(new CodePrimitiveExpression(grainType.Namespace + "." + TypeUtils.GetParameterizedTemplateName(grainType, language: language))),
                 new CodeAttributeArgument(new CodePrimitiveExpression(interfaceId))));
 
+            invokerClass.CustomAttributes.Add(new CodeAttributeDeclaration(new CodeTypeReference(typeof(SerializableAttribute), CodeTypeReferenceOptions.GlobalReference)));
+
             var interfaceIdProperty = new CodeMemberProperty
             {
                 Name = "InterfaceId",
