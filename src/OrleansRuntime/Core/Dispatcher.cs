@@ -380,7 +380,8 @@ namespace Orleans.Runtime
                     message.AddTimestamp(Message.LifecycleTag.EnqueueWorkItem);
 
                 MessagingProcessingStatisticsGroup.OnDispatcherMessageProcessedOk(message);
-                Scheduler.QueueWorkItem(new InvokeWorkItem(targetActivation, message, context), context);
+                var workItem = new InvokeWorkItem(targetActivation, message, context);
+                Scheduler.QueueWorkItem(workItem, context);
             }
         }
 

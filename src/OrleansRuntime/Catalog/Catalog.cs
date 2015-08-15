@@ -139,6 +139,8 @@ namespace Orleans.Runtime
             this.sandbox = new Sandbox();
         }
 
+        public Sandbox Sandbox => sandbox;
+
         internal void SetStorageManager(IStorageProviderManager storageManager)
         {
             storageProviderManager = storageManager;

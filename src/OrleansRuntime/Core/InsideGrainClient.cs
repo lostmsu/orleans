@@ -30,6 +30,8 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Threading.Tasks;
 
+using TaskRemoting;
+
 using Orleans.CodeGeneration;
 using Orleans.Core;
 using Orleans.Runtime.Configuration;
@@ -381,7 +383,9 @@ namespace Orleans.Runtime
 
                         throw exc;
                     }
-                    resultObject = await invoker.Invoke(target, request.InterfaceId, request.MethodId, request.Arguments);
+                    Func<IAddressable, int, int, object[], Task> invoke = invoker.Invoke;
+                    resultObject = await this.Catalog.Sandbox.Domain.Invoke<object>(
+                        invoke, target, request.InterfaceId, request.MethodId, request.Arguments);
                 }
                 catch (Exception exc1)
                 {
