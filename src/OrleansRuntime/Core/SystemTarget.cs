@@ -28,7 +28,7 @@ using Orleans.Runtime.Scheduler;
 
 namespace Orleans.Runtime
 {
-    internal abstract class SystemTarget : ISystemTarget, ISystemTargetBase, IInvokable
+    internal abstract class SystemTarget : MarshalByRefObject, ISystemTarget, ISystemTargetBase, IInvokable
     {
         private IGrainMethodInvoker lastInvoker;
         private readonly SchedulingContext schedulingContext;
