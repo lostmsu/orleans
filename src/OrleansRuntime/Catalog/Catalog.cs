@@ -139,7 +139,7 @@ namespace Orleans.Runtime
             this.sandbox = new Sandbox();
         }
 
-        public Sandbox Sandbox => sandbox;
+        public Sandbox Sandbox { get { return sandbox; } }
 
         internal void SetStorageManager(IStorageProviderManager storageManager)
         {
