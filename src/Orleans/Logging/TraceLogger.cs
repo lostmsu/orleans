@@ -31,6 +31,7 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Security;
 using System.Text;
 using System.Text.RegularExpressions;
 using Orleans.Runtime.Configuration;
@@ -973,6 +974,7 @@ namespace Orleans.Runtime
             Fail(errorCode, "Assert failed with message = " + message);
         }
 
+        [SecurityCritical]
         internal void Fail(ErrorCode errorCode, string message)
         {
             if (message == null)
@@ -1053,6 +1055,7 @@ namespace Orleans.Runtime
         /// </summary>
         /// <param name="dumpType">Type of mini-dump to create</param>
         /// <returns><c>FileInfo</c> for the location of the newly created mini-dump file</returns>
+        [SecurityCritical]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2001:AvoidCallingProblematicMethods", MessageId = "System.Runtime.InteropServices.SafeHandle.DangerousGetHandle")]
         internal static FileInfo CreateMiniDump(MiniDumpType dumpType = MiniDumpType.MiniDumpNormal)
         {

@@ -26,6 +26,7 @@ using System.Threading.Tasks;
 
 namespace Orleans
 {
+    using System.Security;
     using Orleans.Runtime;
 
     internal class UnobservedExceptionsHandlerClass
@@ -36,7 +37,7 @@ namespace Orleans
         private static readonly bool alreadySubscribedToTplEvent = false;
 
         internal delegate void UnobservedExceptionDelegate(ISchedulingContext context, Exception exception);
-        
+        [SecuritySafeCritical]
         static UnobservedExceptionsHandlerClass()
         {
             lock (lockObject)
@@ -49,6 +50,7 @@ namespace Orleans
             }
         }
 
+        [SecurityCritical]
         internal static void SetUnobservedExceptionHandler(UnobservedExceptionDelegate handler)
         {
             lock (lockObject)
@@ -61,6 +63,7 @@ namespace Orleans
             }
         }
 
+        [SecurityCritical]
         internal static void ResetUnobservedExceptionHandler()
         {
             lock (lockObject)

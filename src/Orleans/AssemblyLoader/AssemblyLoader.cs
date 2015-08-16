@@ -26,12 +26,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Security;
 using System.Text;
-
-using Orleans.Runtime;
 
 namespace Orleans.Runtime
 {
+    [SecurityCritical]
     internal class AssemblyLoader
     {
 

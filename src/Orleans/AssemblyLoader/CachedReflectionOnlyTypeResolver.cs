@@ -24,9 +24,11 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 using System;
 using System.IO;
 using System.Reflection;
+using System.Security;
 
 namespace Orleans.Runtime
 {
+    [SecurityCritical]
     internal class CachedReflectionOnlyTypeResolver : CachedTypeResolver
     {
         private static readonly TraceLogger logger;
