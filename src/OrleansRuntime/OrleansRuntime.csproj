@@ -69,10 +69,6 @@
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="TaskRemoting, Version=0.1.0.32935, Culture=neutral, PublicKeyToken=3778033b7ff7d17c, processorArchitecture=MSIL">
-      <HintPath>..\packages\TaskRemoting.0.1.0\lib\TaskRemoting.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Catalog\ActivationState.cs" />
@@ -196,6 +192,10 @@
     <Compile Include="Streams\QueueBalancer\StreamQueueBalancerFactory.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\TaskRemoting\src\TaskRemoting.csproj">
+      <Project>{2e9ab0c9-ee7a-489c-925c-5aa17bf2c7ee}</Project>
+      <Name>TaskRemoting</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Orleans\Orleans.csproj">
       <Project>{BC1BD60C-E7D8-4452-A21C-290AEC8E2E74}</Project>
       <Name>Orleans</Name>

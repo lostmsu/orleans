@@ -49,7 +49,7 @@ namespace Orleans
         // any interaction with it will result in non unit-testable code. Any behaviour that can be accessed 
         // from within client code (including subclasses of this class), should be exposed through IGrainRuntime.
         // The better solution is to refactor this interface and make it injectable through the constructor.
-        internal IActivationData Data;
+        internal IActivationData Data { get; set; }
 
         internal GrainReference GrainReference { get { return Data.GrainReference; } }
 

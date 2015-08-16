@@ -36,6 +36,7 @@ using Orleans.Runtime;
 using Orleans.Concurrency;
 using Orleans.CodeGeneration;
 using Orleans.Runtime.Configuration;
+using System.Security;
 
 namespace Orleans.Serialization
 {
@@ -182,6 +183,7 @@ namespace Orleans.Serialization
             InstallAssemblyLoadEventHandler();
         }
 
+        [SecuritySafeCritical]
         static SerializationManager()
         {
             AppDomain.CurrentDomain.AssemblyResolve += OnResolveEventHandler;

@@ -578,8 +578,7 @@ namespace Orleans.Runtime
 
             activations.IncrementGrainCounter(grainClassName);
 
-            // TODO: remoting: pass data
-            // data.GrainInstance.Data = data;
+            data.GrainInstance.Data = data;
 
             if (logger.IsVerbose)
                 logger.Verbose("CreateGrainInstance {0}{1}", data.Grain, data.ActivationId);

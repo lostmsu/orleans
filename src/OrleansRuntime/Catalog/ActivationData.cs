@@ -39,7 +39,7 @@ namespace Orleans.Runtime
     /// MUST lock this object for any concurrent access
     /// Consider: compartmentalize by usage, e.g., using separate interfaces for data for catalog, etc.
     /// </summary>
-    internal class ActivationData : IActivationData, IInvokable
+    internal class ActivationData : MarshalByRefObject, IActivationData, IInvokable
     {
         // This class is used for activations that have extension invokers. It keeps a dictionary of 
         // invoker objects to use with the activation, and extend the default invoker

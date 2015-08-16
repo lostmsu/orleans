@@ -149,6 +149,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelloWorldGrains", "..\Samp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelloWorld", "..\Samples\HelloWorld\HelloWorld\HelloWorld.csproj", "{3AD197E3-30C1-48BF-AADA-3848F1E988DA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskRemoting", "..\..\TaskRemoting\src\TaskRemoting.csproj", "{2E9AB0C9-EE7A-489C-925C-5AA17BF2C7EE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -223,6 +225,10 @@ Global
 		{3AD197E3-30C1-48BF-AADA-3848F1E988DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3AD197E3-30C1-48BF-AADA-3848F1E988DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3AD197E3-30C1-48BF-AADA-3848F1E988DA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2E9AB0C9-EE7A-489C-925C-5AA17BF2C7EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2E9AB0C9-EE7A-489C-925C-5AA17BF2C7EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2E9AB0C9-EE7A-489C-925C-5AA17BF2C7EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2E9AB0C9-EE7A-489C-925C-5AA17BF2C7EE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
