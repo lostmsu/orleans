@@ -21,11 +21,11 @@ OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHE
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-﻿#define LOG_MEMORY_PERF_COUNTERS
+#define LOG_MEMORY_PERF_COUNTERS
 using System;
 using System.Diagnostics;
 using System.Management;
-
+using System.Security;
 using System.Threading;
 
 namespace Orleans.Runtime
@@ -82,12 +82,14 @@ namespace Orleans.Runtime
             }
         }
 #endif
+        [SecurityCritical]
         internal RuntimeStatisticsGroup()
         {
             InitCpuMemoryCounters();
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
+        [SecurityCritical]
         private void InitCpuMemoryCounters()
         {
             try

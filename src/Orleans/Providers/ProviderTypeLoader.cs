@@ -24,7 +24,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-
+using System.Security;
 using Orleans.Runtime;
 
 namespace Orleans.Providers
@@ -40,6 +40,7 @@ namespace Orleans.Providers
 
         private static readonly TraceLogger logger = TraceLogger.GetLogger("ProviderTypeLoader", TraceLogger.LoggerType.Runtime);
 
+        [SecuritySafeCritical]
         static ProviderTypeLoader()
         {
             managers = new List<ProviderTypeLoader>();
@@ -54,7 +55,7 @@ namespace Orleans.Providers
             IsActive = true;
          }
 
-
+        [SecurityCritical]
         public static void AddProviderTypeManager(Func<Type, bool> condition, Action<Type> action)
         {
             var manager = new ProviderTypeLoader(condition, action);

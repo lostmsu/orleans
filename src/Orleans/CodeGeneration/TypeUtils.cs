@@ -406,7 +406,7 @@ namespace Orleans.Runtime
         {
             return CachedReflectionOnlyTypeResolver.Instance.ResolveType(assemblyQualifiedName);
         }
-
+        [SecuritySafeCritical]
         public static Type ToReflectionOnlyType(Type type)
         {
             return type.Assembly.ReflectionOnly ? type : ResolveReflectionOnlyType(type.AssemblyQualifiedName);

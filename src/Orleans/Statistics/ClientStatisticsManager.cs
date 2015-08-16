@@ -25,6 +25,7 @@ using System;
 using System.Threading.Tasks;
 using Orleans.Runtime.Configuration;
 using Orleans.Providers;
+using System.Security;
 
 namespace Orleans.Runtime
 {
@@ -35,6 +36,7 @@ namespace Orleans.Runtime
         private RuntimeStatisticsGroup runtimeStats;
         private readonly TraceLogger logger ;
 
+        [SecurityCritical]
         internal ClientStatisticsManager(IStatisticsConfiguration config)
         {
             runtimeStats = new RuntimeStatisticsGroup();
