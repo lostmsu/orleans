@@ -25,6 +25,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Security;
 
 namespace Orleans.Runtime
 {
@@ -43,6 +44,7 @@ namespace Orleans.Runtime
             cache = new ConcurrentDictionary<string, Type>();
         }
 
+        [SecurityCritical]
         public Type ResolveType(string name)
         {
             Type result;
@@ -51,6 +53,7 @@ namespace Orleans.Runtime
             throw new KeyNotFoundException(string.Format("Unable to find a type named {0}", name));
         }
 
+        [SecurityCritical]
         public bool TryResolveType(string name, out Type type)
         {
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("A FullName must not be null nor consist of only whitespace.", "name");
@@ -61,6 +64,7 @@ namespace Orleans.Runtime
             return true;
         }
 
+        [SecurityCritical]
         protected virtual bool TryPerformUncachedTypeResolution(string name, out Type type)
         {
             IEnumerable<Assembly> assemblies = AppDomain.CurrentDomain.GetAssemblies();

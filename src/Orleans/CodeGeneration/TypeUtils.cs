@@ -27,6 +27,7 @@ using System.Linq;
 using System.CodeDom;
 using System.Reflection;
 using Orleans.CodeGeneration;
+using System.Security;
 
 namespace Orleans.Runtime
 {
@@ -320,7 +321,7 @@ namespace Orleans.Runtime
             // exclude generated classes.
             return !IsGeneratedType(type);
         }
-
+        [SecuritySafeCritical]
         public static bool IsSystemTargetClass(Type type)
         {
             Type systemTargetType;
@@ -389,16 +390,18 @@ namespace Orleans.Runtime
             return generalType.IsAssignableFrom(type) && TypeHasAttribute(type, typeof(GrainStateAttribute));
         }
             
+        [SecurityCritical]
         public static Type ResolveType(string fullName)
         {
             return CachedTypeResolver.Instance.ResolveType(fullName);
         }
 
+        [SecurityCritical]
         public static bool TryResolveType(string fullName, out Type type)
         {
             return CachedTypeResolver.Instance.TryResolveType(fullName, out type);            
         }
-
+        [SecurityCritical]
         public static Type ResolveReflectionOnlyType(string assemblyQualifiedName)
         {
             return CachedReflectionOnlyTypeResolver.Instance.ResolveType(assemblyQualifiedName);

@@ -28,7 +28,6 @@ using System.Security;
 
 namespace Orleans.Runtime
 {
-    [SecurityCritical]
     internal class CachedReflectionOnlyTypeResolver : CachedTypeResolver
     {
         private static readonly TraceLogger logger;
@@ -41,6 +40,7 @@ namespace Orleans.Runtime
 
         public static new CachedReflectionOnlyTypeResolver Instance { get; private set; }
 
+        [SecurityCritical]
         protected override bool TryPerformUncachedTypeResolution(string name, out Type type)
         {
             AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve += OnReflectionOnlyAssemblyResolve;
@@ -55,6 +55,7 @@ namespace Orleans.Runtime
             }
         }
 
+        [SecurityCritical]
         public static Assembly OnReflectionOnlyAssemblyResolve(object sender, ResolveEventArgs args)
         {
             // loading into the reflection-only context doesn't resolve dependencies automatically.
