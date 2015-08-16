@@ -25,6 +25,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security;
 using System.Text;
 using Orleans.Runtime.Configuration;
 using Orleans.Serialization;
@@ -499,7 +500,7 @@ namespace Orleans.Runtime
                 bodyBytes = body;
             }
         }
-
+        [SecurityCritical]
         public Message CreateResponseMessage()
         {
             var response = new Message(this.Category, Directions.Response)

@@ -24,9 +24,10 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-﻿using System.Linq;
-﻿using System.Runtime.Remoting.Messaging;
-﻿using Orleans.Serialization;
+using System.Linq;
+using System.Runtime.Remoting.Messaging;
+using System.Security;
+using Orleans.Serialization;
 
 
 namespace Orleans.Runtime
@@ -122,6 +123,7 @@ namespace Orleans.Runtime
             return retValue;
         }
 
+        [SecurityCritical]
         internal static void ImportFromMessage(Message msg)
         {
             var contextData = msg.RequestContextData;
@@ -151,6 +153,7 @@ namespace Orleans.Runtime
             }
         }
 
+        [SecurityCritical]
         internal static void ExportToMessage(Message msg)
         {
             Dictionary<string, object> values = GetContextData();
@@ -170,17 +173,20 @@ namespace Orleans.Runtime
                 msg.RequestContextData = values.ToDictionary(kvp => kvp.Key, kvp => SerializationManager.DeepCopy(kvp.Value));
         }
 
+        [SecurityCritical]
         internal static void Clear()
         {
             // Remove the key to prevent passing of its value from this point on
             CallContext.FreeNamedDataSlot(ORLEANS_REQUEST_CONTEXT_KEY);
         }
 
+        [SecurityCritical]
         private static void SetContextData(Dictionary<string, object> values)
         {
             CallContext.LogicalSetData(ORLEANS_REQUEST_CONTEXT_KEY, values);
         }
 
+        [SecurityCritical]
         private static Dictionary<string, object> GetContextData()
         {
             return (Dictionary<string, object>) CallContext.LogicalGetData(ORLEANS_REQUEST_CONTEXT_KEY);

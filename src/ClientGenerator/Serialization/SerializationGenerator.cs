@@ -29,6 +29,7 @@ using System.Reflection;
 
 using Orleans.Runtime;
 using Orleans.Serialization;
+using System.Security;
 
 // Suppress ReSharper warnings about use of CodeDom *Attributes enum's which should have [Flags] attribute but don't
 // ReSharper disable BitwiseOperatorOnEnumWihtoutFlags
@@ -72,14 +73,14 @@ namespace Orleans.CodeGeneration.Serialization
             var className = TypeUtils.GetSimpleTypeName(TypeUtils.GetFullName(t));
             var serializationClassName = className.Replace('.', '_') + SERIALIZER_CLASS_NAME_SUFFIX;
             var serializationClassOpenName = serializationClassName;
-            var classDecl = new CodeTypeDeclaration(serializationClassName) {IsClass = true};
+            var classDecl = new CodeTypeDeclaration(serializationClassName) { IsClass = true };
             classDecl.Attributes = (classDecl.Attributes & ~MemberAttributes.ScopeMask) | MemberAttributes.Static;
             classDecl.TypeAttributes = TypeAttributes.NotPublic;
             CodeGeneratorBase.MarkAsGeneratedCode(classDecl);
 
             if (!t.IsGenericType)
                 classDecl.CustomAttributes.Add(
-                    new CodeAttributeDeclaration(new CodeTypeReference(typeof (RegisterSerializerAttribute),
+                    new CodeAttributeDeclaration(new CodeTypeReference(typeof(RegisterSerializerAttribute),
                         CodeTypeReferenceOptions.GlobalReference)));
 
             if (t.IsGenericType)
@@ -97,7 +98,7 @@ namespace Orleans.CodeGeneration.Serialization
 
                     var constraints = genericParameter.GetGenericParameterConstraints();
                     foreach (var constraintType in constraints)
-                        param.Constraints.Add( new CodeTypeReference(TypeUtils.GetParameterizedTemplateName(constraintType)));
+                        param.Constraints.Add(new CodeTypeReference(TypeUtils.GetParameterizedTemplateName(constraintType)));
 
                     if ((genericParameter.GenericParameterAttributes & GenericParameterAttributes.DefaultConstructorConstraint) != GenericParameterAttributes.None)
                         param.HasConstructorConstraint = true;
@@ -127,6 +128,7 @@ namespace Orleans.CodeGeneration.Serialization
             if (generateCopier)
                 classDecl.Members.Add(copier);
 
+            AddAttribute<SecurityCriticalAttribute>(copier);
             copier.Attributes = (copier.Attributes & ~MemberAttributes.AccessMask) | MemberAttributes.Public;
             copier.Attributes = (copier.Attributes & ~MemberAttributes.ScopeMask) | MemberAttributes.Static;
             copier.Name = "DeepCopier";
@@ -148,6 +150,7 @@ namespace Orleans.CodeGeneration.Serialization
 
             serializer.Attributes = (serializer.Attributes & ~MemberAttributes.AccessMask) | MemberAttributes.Public;
             serializer.Attributes = (serializer.Attributes & ~MemberAttributes.ScopeMask) | MemberAttributes.Static;
+            AddAttribute<SecurityCriticalAttribute>(serializer);
             serializer.Name = "Serializer";
             serializer.Parameters.Add(new CodeParameterDeclarationExpression(objectTypeReference, "untypedInput"));
             serializer.Parameters.Add(new CodeParameterDeclarationExpression(typeof(BinaryTokenStreamWriter), "stream"));
@@ -163,19 +166,22 @@ namespace Orleans.CodeGeneration.Serialization
 
             deserializer.Attributes = (deserializer.Attributes & ~MemberAttributes.AccessMask) | MemberAttributes.Public;
             deserializer.Attributes = (deserializer.Attributes & ~MemberAttributes.ScopeMask) | MemberAttributes.Static;
+            AddAttribute<SecurityCriticalAttribute>(deserializer);
             deserializer.Name = "Deserializer";
             deserializer.Parameters.Add(new CodeParameterDeclarationExpression(typeof(Type), "expected"));
-            deserializer.Parameters.Add(new CodeParameterDeclarationExpression(new CodeTypeReference(typeof(BinaryTokenStreamReader),CodeTypeReferenceOptions.GlobalReference), "stream"));
+            deserializer.Parameters.Add(new CodeParameterDeclarationExpression(new CodeTypeReference(typeof(BinaryTokenStreamReader), CodeTypeReferenceOptions.GlobalReference), "stream"));
             deserializer.ReturnType = objectTypeReference;
 
             // Static constructor, which just calls the Init method
             var staticConstructor = new CodeTypeConstructor();
             classDecl.Members.Add(staticConstructor);
+            AddAttribute<SecuritySafeCriticalAttribute>(staticConstructor);
             staticConstructor.Statements.Add(new CodeMethodInvokeExpression(new CodeMethodReferenceExpression(null, "Register")));
 
             // Init method, which registers the type with the serialization manager, and later may get some static FieldInfo initializers
             var init = new CodeMemberMethod();
             classDecl.Members.Add(init);
+            AddAttribute<SecurityCriticalAttribute>(init);
             init.Name = "Register";
             init.Attributes = (init.Attributes & ~MemberAttributes.AccessMask) | MemberAttributes.Public;
             init.Attributes = (init.Attributes & ~MemberAttributes.ScopeMask) | MemberAttributes.Static;
@@ -215,18 +221,18 @@ namespace Orleans.CodeGeneration.Serialization
                     var typeName = TypeUtils.GetParameterizedTemplateName(t, tt => tt.Namespace != container.Name && !referencedNamespaces.Contains(tt.Namespace), true);
                     if (language == Language.VisualBasic)
                         typeName = typeName.Replace("<", "(Of ").Replace(">", ")");
-                    constructor = new CodeVariableDeclarationStatement(classTypeReference, "result", 
+                    constructor = new CodeVariableDeclarationStatement(classTypeReference, "result",
                         new CodeObjectCreateExpression(typeName));
                 }
             }
             else if (t.IsValueType)
             {
-                constructor = !t.ContainsGenericParameters 
-                    ? new CodeVariableDeclarationStatement(classTypeReference, "result", new CodeDefaultValueExpression(new CodeTypeReference(t))) 
+                constructor = !t.ContainsGenericParameters
+                    ? new CodeVariableDeclarationStatement(classTypeReference, "result", new CodeDefaultValueExpression(new CodeTypeReference(t)))
                     : new CodeVariableDeclarationStatement(classTypeReference, "result", new CodeDefaultValueExpression(new CodeTypeReference(TypeUtils.GetTemplatedName(t))));
-                }
-                else
-                {
+            }
+            else
+            {
                 if (!t.ContainsGenericParameters)
                 {
                     constructor = new CodeVariableDeclarationStatement(classTypeReference, "result",
@@ -291,19 +297,19 @@ namespace Orleans.CodeGeneration.Serialization
                     if ((property != null) && property.DeclaringType == fld.DeclaringType)
                     {
                         if (property.GetGetMethod() != null)
-                            getter = new CodePropertyReferenceExpression(new CodeArgumentReferenceExpression("input"), 
+                            getter = new CodePropertyReferenceExpression(new CodeArgumentReferenceExpression("input"),
                                 propertyName);
                         if (!usingBoxedReflection && (property.GetSetMethod() != null))
                         {
                             setter = value =>
+                            {
+                                var s = new CodeAssignStatement
                                 {
-                                    var s = new CodeAssignStatement
-                                                {
                                     Left = new CodePropertyReferenceExpression(new CodeVariableReferenceExpression("result"), propertyName),
-                                                    Right = value
-                                                };
-                                    return new CodeStatementCollection(new CodeStatement[] { s });
+                                    Right = value
                                 };
+                                return new CodeStatementCollection(new CodeStatement[] { s });
+                            };
                         }
                     }
                 }
@@ -321,14 +327,14 @@ namespace Orleans.CodeGeneration.Serialization
                         if (!usingBoxedReflection && (setter == null) && !fld.IsInitOnly)
                         {
                             setter = value =>
+                            {
+                                var s = new CodeAssignStatement
                                 {
-                                    var s = new CodeAssignStatement
-                                                {
-                                    Left = new CodeFieldReferenceExpression( new CodeVariableReferenceExpression("result"), normalizedName),
-                                                    Right = value
-                                                };
-                                    return new CodeStatementCollection(new CodeStatement[] { s });
+                                    Left = new CodeFieldReferenceExpression(new CodeVariableReferenceExpression("result"), normalizedName),
+                                    Right = value
                                 };
+                                return new CodeStatementCollection(new CodeStatement[] { s });
+                            };
                         }
                     }
                 }
@@ -367,9 +373,9 @@ namespace Orleans.CodeGeneration.Serialization
 
                     // Build the getter and setter
                     if (getter == null)
-                        getter = new CodeMethodInvokeExpression( 
+                        getter = new CodeMethodInvokeExpression(
                             new CodeMethodReferenceExpression(
-                                new CodeFieldReferenceExpression(null, infoName), "GetValue"), 
+                                new CodeFieldReferenceExpression(null, infoName), "GetValue"),
                             new CodeArgumentReferenceExpression("input"));
 
                     if (setter == null)
@@ -398,25 +404,25 @@ namespace Orleans.CodeGeneration.Serialization
                                 usingBoxedReflection = true;
                                 // NOTE: object objResult = (object)result;
                                 if (!shallowCopyable)
-                                    copier.Statements.Add(new CodeVariableDeclarationStatement(typeof (object), "objResult",
-                                        new CodeCastExpression(typeof (object), new CodeVariableReferenceExpression("result"))));
+                                    copier.Statements.Add(new CodeVariableDeclarationStatement(typeof(object), "objResult",
+                                        new CodeCastExpression(typeof(object), new CodeVariableReferenceExpression("result"))));
 
                                 deserializer.Statements.Add(new CodeVariableDeclarationStatement(typeof(object), "objResult",
                                     new CodeCastExpression(typeof(object), new CodeVariableReferenceExpression("result"))));
                             }
                             var temp = "temp" + counter;
                             setter = value =>
-                                         {
-                                             var s1 = new CodeVariableDeclarationStatement(typeof(object), temp, value);
-                                             var s2 = new CodeExpressionStatement
-                                                {
+                            {
+                                var s1 = new CodeVariableDeclarationStatement(typeof(object), temp, value);
+                                var s2 = new CodeExpressionStatement
+                                {
                                     Expression = new CodeMethodInvokeExpression(
-                                        new CodeMethodReferenceExpression(new CodeFieldReferenceExpression(null, infoName), "SetValue"),
-                                                            new CodeVariableReferenceExpression("objResult"),
-                                                            new CodeVariableReferenceExpression(temp))
-                                                };
-                                             return new CodeStatementCollection(new CodeStatement[] { s1, s2 });
-                                         };
+                           new CodeMethodReferenceExpression(new CodeFieldReferenceExpression(null, infoName), "SetValue"),
+                                               new CodeVariableReferenceExpression("objResult"),
+                                               new CodeVariableReferenceExpression(temp))
+                                };
+                                return new CodeStatementCollection(new CodeStatement[] { s1, s2 });
+                            };
                         }
                     }
                 }
@@ -427,7 +433,7 @@ namespace Orleans.CodeGeneration.Serialization
                     if (fld.FieldType.IsOrleansShallowCopyable())
                         copier.Statements.AddRange(setter(getter));
                     else
-                        copier.Statements.AddRange(fld.FieldType == typeof (object)
+                        copier.Statements.AddRange(fld.FieldType == typeof(object)
                             ? setter(new CodeMethodInvokeExpression(serMgrRefExp, "DeepCopyInner", getter))
                             : setter(new CodeCastExpression(typeName,
                                 new CodeMethodInvokeExpression(serMgrRefExp, "DeepCopyInner", getter))));
@@ -439,7 +445,7 @@ namespace Orleans.CodeGeneration.Serialization
 
                 // Deserialize this field
                 deserializer.Statements.AddRange(setter(new CodeCastExpression(typeName,
-                    new CodeMethodInvokeExpression(serMgrRefExp, "DeserializeInner", 
+                    new CodeMethodInvokeExpression(serMgrRefExp, "DeserializeInner",
                         new CodeTypeOfExpression(typeName), new CodeArgumentReferenceExpression("stream")))));
             }
 
@@ -469,18 +475,18 @@ namespace Orleans.CodeGeneration.Serialization
                     new CodeMethodReferenceExpression(new CodeTypeReferenceExpression(notVB ? masterClassName : "AddressOf " + masterClassName), "GenericDeserializer")));
 
                 var initClosed = new CodeMethodInvokeExpression
-                                     {
-                                         Method = new CodeMethodReferenceExpression
-                                                      {
-                                                          MethodName = "Invoke",
-                                                          TargetObject =
+                {
+                    Method = new CodeMethodReferenceExpression
+                    {
+                        MethodName = "Invoke",
+                        TargetObject =
                                                               new CodeMethodInvokeExpression(
                                                               new CodeVariableReferenceExpression
                                                                   ("closed"), "GetMethod",
                                                               new CodePrimitiveExpression(
                                                                   "Register"))
-                                                      }
-                                     };
+                    }
+                };
                 initClosed.Parameters.Add(new CodePrimitiveExpression(null));
                 initClosed.Parameters.Add(new CodeArrayCreateExpression(typeof(object), 0));
 
@@ -527,7 +533,7 @@ namespace Orleans.CodeGeneration.Serialization
                 ser.Statements.Add(new CodeVariableDeclarationStatement(typeof(MethodInfo), "f",
                     new CodeMethodInvokeExpression(new CodeVariableReferenceExpression("t"), "GetMethod", new CodePrimitiveExpression("Serializer"))));
                 ser.Statements.Add(new CodeVariableDeclarationStatement(typeof(object[]), "args",
-                    new CodeArrayCreateExpression(typeof(object), new CodeExpression[] { new CodeArgumentReferenceExpression("input"), 
+                    new CodeArrayCreateExpression(typeof(object), new CodeExpression[] { new CodeArgumentReferenceExpression("input"),
                         new CodeArgumentReferenceExpression("stream"), new CodeArgumentReferenceExpression("expected")})));
                 ser.Statements.Add(new CodeMethodInvokeExpression(new CodeVariableReferenceExpression("f"), "Invoke", new CodePrimitiveExpression(),
                         new CodeVariableReferenceExpression("args")));
@@ -547,13 +553,20 @@ namespace Orleans.CodeGeneration.Serialization
                 deser.Statements.Add(new CodeVariableDeclarationStatement(typeof(MethodInfo), "f",
                     new CodeMethodInvokeExpression(new CodeVariableReferenceExpression("t"), "GetMethod", new CodePrimitiveExpression("Deserializer"))));
                 deser.Statements.Add(new CodeVariableDeclarationStatement(typeof(object[]), "args",
-                    new CodeArrayCreateExpression(typeof(object), new CodeExpression[] { new CodeArgumentReferenceExpression("expected"), 
+                    new CodeArrayCreateExpression(typeof(object), new CodeExpression[] { new CodeArgumentReferenceExpression("expected"),
                         new CodeArgumentReferenceExpression("stream")})));
                 deser.Statements.Add(new CodeMethodReturnStatement(
                     new CodeMethodInvokeExpression(new CodeVariableReferenceExpression("f"), "Invoke", new CodePrimitiveExpression(),
                         new CodeVariableReferenceExpression("args"))));
             }
             container.Types.Add(classDecl);
+        }
+
+        private static void AddAttribute<T>(CodeMemberMethod method) where T : System.Attribute
+        {
+            method.CustomAttributes.Add(new CodeAttributeDeclaration(
+                new CodeTypeReference(typeof(T)
+            )));
         }
 
         private static CodeMemberMethod AddInitMethod(CodeTypeDeclaration type)

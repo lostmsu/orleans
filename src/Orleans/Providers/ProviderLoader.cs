@@ -30,6 +30,7 @@ using System.Xml;
 using System.Threading.Tasks;
 using Orleans.Runtime;
 using Orleans.Runtime.Configuration;
+using System.Security;
 
 namespace Orleans.Providers
 {
@@ -65,6 +66,7 @@ namespace Orleans.Providers
             providers = new Dictionary<string, TProvider>();
         }
 
+        [SecurityCritical]
         public void LoadProviders(IDictionary<string, IProviderConfiguration> configs, IProviderManager providerManager)
         {
 
