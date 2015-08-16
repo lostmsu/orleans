@@ -131,6 +131,7 @@ namespace Orleans.Runtime
             }
         }
 
+        [System.Security.SecurityCritical]
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             if (info != null)

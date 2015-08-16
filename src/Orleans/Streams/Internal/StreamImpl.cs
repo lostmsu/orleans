@@ -32,7 +32,7 @@ namespace Orleans.Streams
 {
     [Serializable]
     [Immutable]
-    internal class StreamImpl<T> : IStreamIdentity, IAsyncStream<T>, IStreamControl, ISerializable
+    internal class StreamImpl<T> : IStreamIdentity, IAsyncStream<T>, IStreamControl
     {
         private readonly StreamId                               streamId;
         private readonly bool                                   isRewindable;
@@ -210,25 +210,5 @@ namespace Orleans.Streams
         {
             return streamId.ToString();
         }
-                
-        #region ISerializable Members
-
-        public void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            // Use the AddValue method to specify serialized values.
-            info.AddValue("StreamId", streamId, typeof(StreamId));
-            info.AddValue("IsRewindable", isRewindable, typeof(bool));
-        }
-
-        // The special constructor is used to deserialize values. 
-        protected StreamImpl(SerializationInfo info, StreamingContext context)
-        {
-            // Reset the property value using the GetValue method.
-            streamId = (StreamId)info.GetValue("StreamId", typeof(StreamId));
-            isRewindable = info.GetBoolean("IsRewindable");
-            initLock = new object();
-        }
-
-        #endregion
     }
 }

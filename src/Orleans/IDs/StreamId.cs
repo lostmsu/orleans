@@ -131,8 +131,8 @@ namespace Orleans.Streams
         }
 
         #region ISerializable Members
-
-        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        [System.Security.SecurityCritical]
+        void ISerializable.GetObjectData(SerializationInfo info, StreamingContext context)
         {
             // Use the AddValue method to specify serialized values.
             info.AddValue("Guid", Guid, typeof(Guid));

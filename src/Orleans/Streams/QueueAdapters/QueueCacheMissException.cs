@@ -35,14 +35,14 @@ namespace Orleans.Streams
             High = high;
         }
 
-        public QueueCacheMissException(SerializationInfo info, StreamingContext context)
+        protected QueueCacheMissException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
             Requested = info.GetString("Requested");
             Low = info.GetString("Low");
             High = info.GetString("High");
         }
-
+        [System.Security.SecurityCritical]
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             info.AddValue("Requested", Requested);

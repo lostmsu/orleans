@@ -34,7 +34,7 @@ namespace Orleans.Streams
     /// This class is a [Serializable] function pointer to a static predicate method, used for stream filtering.
     /// </summary>
     [Serializable]
-    internal class FilterPredicateWrapperData : IStreamFilterPredicateWrapper
+    internal class FilterPredicateWrapperData : IStreamFilterPredicateWrapper, ISerializable
     {
         public object FilterData { get; private set; }
 
@@ -59,7 +59,8 @@ namespace Orleans.Streams
             className = info.GetString("ClassName");
             predicateFunc = RehydrateStaticFuncion(className, methodName);
         }
-        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        [System.Security.SecurityCritical]
+        void ISerializable.GetObjectData(SerializationInfo info, StreamingContext context)
         {
             info.AddValue("FilterData", FilterData);
             info.AddValue("MethodName", methodName);

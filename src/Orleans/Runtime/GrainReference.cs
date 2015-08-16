@@ -28,6 +28,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Orleans.Serialization;
 using Orleans.CodeGeneration;
+using System.Security;
 
 namespace Orleans.Runtime
 {
@@ -686,9 +687,12 @@ namespace Orleans.Runtime
 
 
         #region ISerializable Members
-
-        public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
+        [SecurityCritical]
+        void ISerializable.GetObjectData(SerializationInfo info, StreamingContext context)
         {
+            if (info == null)
+                throw new ArgumentNullException("info");
+
             // Use the AddValue method to specify serialized values.
             info.AddValue("GrainId", GrainId.ToParsableString(), typeof(string));
             if (IsSystemTarget)
@@ -704,7 +708,7 @@ namespace Orleans.Runtime
                 genericArg = genericArguments;
             info.AddValue("GenericArguments", genericArg, typeof(string));
         }
-
+        
         // The special constructor is used to deserialize values. 
         protected GrainReference(SerializationInfo info, StreamingContext context)
         {

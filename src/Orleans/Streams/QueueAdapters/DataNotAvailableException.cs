@@ -37,7 +37,7 @@ namespace Orleans.Streams
         public DataNotAvailableException(string message) : base(message) { }
         public DataNotAvailableException(string message, Exception inner) : base(message, inner) { }
 
-        public DataNotAvailableException(SerializationInfo info, StreamingContext context)
+        protected DataNotAvailableException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
         }

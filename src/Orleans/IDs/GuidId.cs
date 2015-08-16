@@ -34,7 +34,7 @@ namespace Orleans.Runtime
     /// </summary>
     [Serializable]
     [Immutable]
-    public sealed class GuidId : IEquatable<GuidId>, IComparable<GuidId>, ISerializable
+    public sealed class GuidId : IEquatable<GuidId>, IComparable<GuidId>
     {
         private static readonly Lazy<Interner<Guid, GuidId>> guidIdInternCache = new Lazy<Interner<Guid, GuidId>>(
                     () => new Interner<Guid, GuidId>(InternerConstants.SIZE_LARGE, InternerConstants.DefaultCacheCleanupFreq));
@@ -135,21 +135,6 @@ namespace Orleans.Runtime
         public static bool operator !=(GuidId a, GuidId b)
         {
             return !(a == b);
-        }
-
-        #endregion
-
-        #region ISerializable Members
-
-        public void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            info.AddValue("Guid", Guid, typeof(Guid));
-        }
-
-        // The special constructor is used to deserialize values. 
-        private GuidId(SerializationInfo info, StreamingContext context)
-        {
-            Guid = (Guid) info.GetValue("Guid", typeof(Guid));
         }
 
         #endregion
