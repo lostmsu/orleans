@@ -40,7 +40,7 @@ using Orleans.Runtime.Scheduler;
 using Orleans.Runtime.ConsistentRing;
 using Orleans.Serialization;
 using Orleans.Storage;
-
+using System.Runtime.Remoting;
 
 namespace Orleans.Runtime
 {
@@ -383,9 +383,17 @@ namespace Orleans.Runtime
 
                         throw exc;
                     }
-                    Func<IAddressable, int, int, object[], Task> invoke = invoker.Invoke;
-                    resultObject = await this.Catalog.Sandbox.Domain.Invoke<object>(
-                        invoke, target, request.InterfaceId, request.MethodId, request.Arguments);
+                    if (RemotingServices.IsTransparentProxy(target)
+                        || RemotingServices.IsTransparentProxy(invoker))
+                    {
+                        Func<IAddressable, int, int, object[], Task> invoke = invoker.Invoke;
+                        resultObject = await this.Catalog.Sandbox.Domain.Invoke<object>(
+                            invoke, target, request.InterfaceId, request.MethodId, request.Arguments);
+                    }
+                    else
+                    {
+                        resultObject = await invoker.Invoke(target, request.InterfaceId, request.MethodId, request.Arguments);
+                    }
                 }
                 catch (Exception exc1)
                 {
