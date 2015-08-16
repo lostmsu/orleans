@@ -145,6 +145,7 @@ namespace Orleans.Serialization
             }
         }
 
+        [SecuritySafeCritical]
         internal static void Initialize(bool useStandardSerializer)
         {
             UseStandardSerializer = useStandardSerializer;
@@ -1862,6 +1863,7 @@ namespace Orleans.Serialization
             return DeserializeFromByteArray<T>(data);
         }
 
+        [SecurityCritical]
         private static void InstallAssemblyLoadEventHandler()
         {
             // initialize serialization for all assemblies to be loaded.
