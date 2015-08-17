@@ -34,6 +34,7 @@ using Orleans.Core;
 using Orleans.Providers;
 using Orleans.Runtime;
 using Orleans.Runtime.Configuration;
+using System.Security;
 
 namespace Orleans
 {
@@ -90,6 +91,7 @@ namespace Orleans
         /// <summary>
         /// Initializes the client runtime from the standard client configuration file.
         /// </summary>
+        [SecurityCritical]
         public static void Initialize()
         {
             ClientConfiguration config = ClientConfiguration.StandardLoad();
@@ -106,6 +108,7 @@ namespace Orleans
         /// If an error occurs reading the specified configuration file, the initialization fails.
         /// </summary>
         /// <param name="configFilePath">A relative or absolute pathname for the client configuration file.</param>
+        [SecurityCritical]
         public static void Initialize(string configFilePath)
         {
             Initialize(new FileInfo(configFilePath));
@@ -117,6 +120,7 @@ namespace Orleans
         /// </summary>
         /// <param name="configFile">The client configuration file.</param>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1011:ConsiderPassingBaseTypesAsParameters")]
+        [SecurityCritical]
         public static void Initialize(FileInfo configFile)
         {
             ClientConfiguration config;
@@ -142,6 +146,7 @@ namespace Orleans
         /// If the configuration object is null, the initialization fails. 
         /// </summary>
         /// <param name="config">A ClientConfiguration object.</param>
+        [SecurityCritical]
         public static void Initialize(ClientConfiguration config)
         {
             if (config == null)
@@ -179,6 +184,7 @@ namespace Orleans
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
+        [SecurityCritical]
         private static void InternalInitialize(ClientConfiguration config, OutsideRuntimeClient runtimeClient = null)
         {
             // We deliberately want to run this initialization code on .NET thread pool thread to escape any 
@@ -212,6 +218,9 @@ namespace Orleans
         /// <summary>
         /// Initializes client runtime from client configuration object.
         /// </summary>
+        [SecuritySafeCritical]
+        // SECURITY: THIS SHOULD NEVER BE PUBLISHED. The reason for this method to be
+        // SecuritySafeCritical is to allow it be called from async delegate in InternalInitialize
         private static void DoInternalInitialize(ClientConfiguration config, OutsideRuntimeClient runtimeClient = null)
         {
             if (IsInitialized)

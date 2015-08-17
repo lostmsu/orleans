@@ -74,6 +74,7 @@ namespace Orleans
         
     }
 
+    [Serializable]
     internal class ReminderTableData
     {
         public IList<ReminderEntry> Reminders { get; private set; }

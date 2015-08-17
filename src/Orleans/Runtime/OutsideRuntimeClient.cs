@@ -38,6 +38,7 @@ using Orleans.Serialization;
 using Orleans.Storage;
 using Orleans.Runtime.Configuration;
 using System.Collections.Concurrent;
+using System.Security;
 
 namespace Orleans
 {
@@ -132,6 +133,7 @@ namespace Orleans
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope",
             Justification = "MessageCenter is IDisposable but cannot call Dispose yet as it lives past the end of this method call.")]
+        [SecurityCritical]
         public OutsideRuntimeClient(ClientConfiguration cfg, GrainFactory grainFactory, bool secondary = false)
         {
             this.grainFactory = grainFactory;
@@ -237,6 +239,7 @@ namespace Orleans
             CurrentStreamProviderManager = streamProviderManager;
         }
 
+        [SecurityCritical]
         private static void LoadAdditionalAssemblies()
         {
             var logger = TraceLogger.GetLogger("AssemblyLoader.Client", TraceLogger.LoggerType.Runtime);
@@ -279,6 +282,7 @@ namespace Orleans
             logger.Assert(ErrorCode.Runtime_Error_100008, context == null, "context should be not null only inside OrleansRuntime and not on the client.");
         }
 
+        [SecurityCritical]
         public void Start()
         {
             lock (staticLock)
@@ -293,6 +297,7 @@ namespace Orleans
               
         }
 
+        [SecurityCritical]
         // used for testing to (carefully!) allow two clients in the same process
         internal void StartInternal()
         {
@@ -613,6 +618,7 @@ namespace Orleans
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope",
             Justification = "CallbackData is IDisposable but instances exist beyond lifetime of this method so cannot Dispose yet.")]
+        [SecurityCritical]
         public void SendRequest(GrainReference target, InvokeMethodRequest request, TaskCompletionSource<object> context, Action<Message, TaskCompletionSource<object>> callback, string debugContext = null, InvokeMethodOptions options = InvokeMethodOptions.None, string genericArguments = null)
         {
             var message = RuntimeClient.CreateMessage(request, options);

@@ -319,7 +319,8 @@ namespace Orleans.Runtime
         /// <summary>
         /// Called from generated code.
         /// </summary>
-        protected async Task<T> InvokeMethodAsync<T>(int methodId, object[] arguments, InvokeMethodOptions options = InvokeMethodOptions.None, SiloAddress silo = null)
+        [SecurityCritical]
+        protected Task<T> InvokeMethodAsync<T>(int methodId, object[] arguments, InvokeMethodOptions options = InvokeMethodOptions.None, SiloAddress silo = null)
         {
             object[] argsDeepCopy = null;
             if (arguments != null)
@@ -337,17 +338,17 @@ namespace Orleans.Runtime
 
             if (resultTask == null)
             {
-                return default(T);
+                return Task.FromResult(default(T));
             }
 
-            resultTask = OrleansTaskExtentions.ConvertTaskViaTcs(resultTask);
-            return (T) await resultTask;
+            return OrleansTaskExtentions.ConvertTaskViaTcs(resultTask)
+                .ContinueWith(task => (T)task.Result);
         }
 
         #endregion
 
         #region Private members
-
+        [SecurityCritical]
         private Task<object> InvokeMethod_Impl(InvokeMethodRequest request, string debugContext, InvokeMethodOptions options)
         {
             if (debugContext == null && USE_DEBUG_CONTEXT)
