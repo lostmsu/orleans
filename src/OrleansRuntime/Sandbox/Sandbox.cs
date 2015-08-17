@@ -23,6 +23,7 @@
                 ApplicationBase = Environment.CurrentDirectory,
             };
             var trustedAssemblies = new StrongName[] {
+                typeof(GrainReference).Assembly.GetStrongName(),
                 typeof(RemoteTask).Assembly.GetStrongName(),
             };
 
